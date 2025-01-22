@@ -17,12 +17,14 @@ jobs:
 
     steps:
       - name: Checkout target branch code (using pull_request_target)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.pull_request.base.ref }}  # target branch
+          ref: ${{ github.event.pull_request.base.ref }}
 
       - name: Checkout PR branch code (source branch)
-        run: git fetch origin ${{ github.event.pull_request.head.ref }} && git checkout ${{ github.event.pull_request.head.ref }}
+        run: |
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr_branch
+          git checkout pr_branch
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -92,12 +94,14 @@ jobs:
     
     steps:
       - name: Checkout target branch code (using pull_request_target)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.pull_request.base.ref }}  # target branch
+          ref: ${{ github.event.pull_request.base.ref }}
 
       - name: Checkout PR branch code (source branch)
-        run: git fetch origin ${{ github.event.pull_request.head.ref }} && git checkout ${{ github.event.pull_request.head.ref }}
+        run: |
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr_branch
+          git checkout pr_branch
 
       - name: Checkout BMF repository (specific branch)
         run: |

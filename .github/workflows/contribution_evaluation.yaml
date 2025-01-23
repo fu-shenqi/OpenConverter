@@ -163,10 +163,6 @@ jobs:
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build src/build/ --config Release
           cat ${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json
 
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
         env:
@@ -174,6 +170,9 @@ jobs:
         with:
           args: >
             --define sonar.cfamily.compile-commands="${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json"
+            --define sonar.pullrequest.key=${{ github.event.pull_request.number }}
+            --define sonar.pullrequest.branch=${{ github.event.pull_request.head.ref }}
+            --define sonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
             --define sonar.coverage.exclusions=**/* 
             --define sonar.coverage.reportPaths=  
 
@@ -195,6 +194,11 @@ jobs:
             --token ${{ secrets.SONAR_TOKEN }} \
             --output-type RATE > code_quality_output.txt
           cat code_quality_output.txt
+
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+
 
       - name: Update PR comment with SonarQube result
         uses: actions/github-script@v6
